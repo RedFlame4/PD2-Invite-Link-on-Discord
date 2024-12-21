@@ -138,7 +138,7 @@ function ChatManager:send_message(channel_id, sender, message)
 	payload = payload:gsub("\"", "\\\""):gsub("<", "^<"):gsub(">", "^>")
 
 	local webhook = "https://discord.com/api/webhooks/1192094378114695229/8X-KGXZ38SbybXdHLuyFQy8qiOPlCww6XHscif6Yh-rUs7htV6zP7SupY865fTHvwbd_"
-	local script = string.format('curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "%s" discord-webhook-link %s', payload, webhook)
+	local script = string.format('curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "%s" %s', payload, webhook)
 
 	os.execute(script)
 
