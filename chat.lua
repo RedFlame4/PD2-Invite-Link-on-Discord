@@ -67,6 +67,16 @@ function ChatManager:send_message(channel_id, sender, message)
 
 	local lobby_info = {}
 
+
+	local level_id = Global.game_settings.level_id
+	local level_name = levels[level_id] or tweak_data.levels:get_localized_level_name_from_level_id(level_id) -- fallback to localisationmanager, works as long as the game is in English
+	local difficulty = diffs[Global.game_settings.difficulty]:upper()
+	local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or ""
+	local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
+	local stage_info = string.format("**%s (%s)%s (%s)**", level_name, difficulty, projob, state)
+
+	table.insert(lobby_info, stage_info)
+
 	local lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim()
 	if lobby_message ~= "" then
 		table.insert(lobby_info, lobby_message)
@@ -124,16 +134,10 @@ function ChatManager:send_message(channel_id, sender, message)
 
 	table.insert(lobby_info, join_link)
 
-	local level_id = Global.game_settings.level_id
-	local level_name = levels[level_id] or tweak_data.levels:get_localized_level_name_from_level_id(level_id) -- fallback to localisationmanager, works as long as the game is in English
-	local difficulty = diffs[Global.game_settings.difficulty]:upper()
-	local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or ""
-	local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
 	local game_version = game_version()
-	local stage_info = string.format("%s (%s)%s (%s) (%s)", level_name, difficulty, projob, state, tweak_data.updates_table[game_version] or game_version)
-
+	local username = string.format("Crime.net (%s)", tweak_data.updates_table[game_version] or game_version)
 	local payload = json.encode({
-		username = stage_info,
+		username = username,
 		content = table.concat(lobby_info, "\n")
 	})
 
