@@ -19,7 +19,7 @@ function ChatManager:send_message(channel_id, sender, message)
 		local level_name = managers.localization:text(managers.job:current_level_data().name_id)
 		local contract_name = #job_chain_data > 1 and string.format("%s: %s", job_name, level_name) or job_name
 
-		local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_id)
+		local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[Global.game_settings.difficulty])
 		local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or ""
 		local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
 
