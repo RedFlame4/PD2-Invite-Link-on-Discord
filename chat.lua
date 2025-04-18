@@ -48,6 +48,7 @@ function ChatManager:send_message(channel_id, sender, message)
 			local rank = is_local_peer and (managers.experience.current_rank and managers.experience:current_rank() or 0) or peer:profile("rank") or 0
 			local level = is_local_peer and managers.experience:current_level() or peer:profile("level")
 
+			local character_name = managers.localization:to_upper_text("menu_" .. tostring(peer:character()))
 			local name_link = string.format("[%s](<https://steamcommunity.com/profiles/%s/>)", peer:name(), peer:user_id())
 			if rank and level then
 				rank, level = managers.experience.rank_string and managers.experience:rank_string(rank) or "", tostring(level)
@@ -58,7 +59,7 @@ function ChatManager:send_message(channel_id, sender, message)
 
 				player_info = string.format(
 					"%s **%s (%s)**%s",
-					CriminalsManager.convert_old_to_new_character_workname(peer:character()):upper(),
+					character_name,
 					name_link,
 					level,
 					i == 1 and " (Host)" or ""
@@ -67,7 +68,7 @@ function ChatManager:send_message(channel_id, sender, message)
 				-- Player hasn't synced their infamy/level yet since they're still joining
 				player_info = string.format(
 					"%s **%s** (Joining)",
-					CriminalsManager.convert_old_to_new_character_workname(peer:character()):upper(),
+					character_name,
 					name_link
 				)
 			end
