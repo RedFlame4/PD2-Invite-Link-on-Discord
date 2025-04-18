@@ -11,71 +11,22 @@ function ChatManager:send_message(channel_id, sender, message)
 		return
 	end
 
-	local diffs = {
-		normal = "Normal",
-		hard = "Hard",
-		overkill = "Very Hard",
-		overkill_145 = "OVERKILL",
-		easy_wish = "Mayhem",
-		overkill_290 = "Death Wish",
-		sm_wish = "Death Sentence",
-	}
-
-	local levels = {
-		airport = "Airport",
-		alex_1 = "Cook Off",
-		alex_2 = "Code for Meth",
-		alex_3 = "Bus Stop",
-		arm_cro = "Transport: Crossroads",
-		arm_fac = "Transport: Harbor",
-		arm_for = "Transport: Train Heist",
-		arm_hcm = "Transport: Downtown",
-		arm_par = "Transport: Park",
-		arm_und = "Transport: Underpass",
-		big = "The Big Bank",
-		branchbank = "Bank Heist",
-		election_day_1 = "Right Track",
-		election_day_2 = "Swing Vote",
-		election_day_3 = "Breaking Ballot",
-		escape_cafe = "Cafe Escape",
-		escape_garage = "Garage Escape",
-		escape_overpass = "Overpass Escape",
-		escape_park = "Park Escape",
-		escape_street = "Street Escape",
-		family = "Diamond Store",
-		firestarter_1 = "Firestarter: Airport",
-		firestarter_2 = "Firestarter: FBI Server",
-		firestarter_3 = "Firestarter: Trustee Bank",
-		four_stores = "Four Stores",
-		framing_frame_1 = "Art Gallery",
-		framing_frame_2 = "Train Trade",
-		framing_frame_3 = "Framing",
-		haunted = "Safe House Nightmare",
-		jewelry_store = "Jewelry Store",
-		kosugi = "Shadow Raid",
-		mallcrasher = "Mallcrasher",
-		mia_1 = "Hotline Miami",
-		mia_2 = "Four Floors",
-		nightclub = "Nightclub",
-		roberts = "GO Bank",
-		ukrainian_job = "Ukrainian Job",
-		watchdogs_1 = "Truck Load",
-		watchdogs_2 = "Boat Load",
-		welcome_to_the_jungle_1 = "Club House",
-		welcome_to_the_jungle_2 = "Engine Problem",
-	}
-
 	local lobby_info = {}
 
+	if managers.job:has_active_job() then
+		local job_chain_data = managers.job.current_job_chain_data and managers.job:current_job_chain_data() or managers.job:current_job_data().chain -- current_job_chain_data added later
+		local job_name = managers.localization:text(managers.job:current_job_data().name_id)
+		local level_name = managers.localization:text(managers.job:current_level_data().name_id)
+		local contract_name = #job_chain_data > 1 and string.format("%s: %s", job_name, level_name) or job_name
 
-	local level_id = Global.game_settings.level_id
-	local level_name = levels[level_id] or tweak_data.levels:get_localized_level_name_from_level_id(level_id) -- fallback to localisationmanager, works as long as the game is in English
-	local difficulty = diffs[Global.game_settings.difficulty]:upper()
-	local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or ""
-	local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
-	local stage_info = string.format("**%s (%s)%s (%s)**", level_name, difficulty, projob, state)
+		local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_id)
+		local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or ""
+		local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
 
-	table.insert(lobby_info, stage_info)
+		local stage_info = string.format("**%s (%s)%s (%s)**", contract_name, difficulty, projob, state)
+
+		table.insert(lobby_info, stage_info)
+	end
 
 	local lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim()
 	if lobby_message ~= "" then
