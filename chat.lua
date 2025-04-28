@@ -5,7 +5,7 @@ function ChatManager:send_message(channel_id, sender, message)
 	end
 
 	if Global.game_settings.permission ~= "public" then
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DBU37_premission"))
+		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_permission"))
 		managers.menu_component:post_event("menu_error")
 
 		return
@@ -97,10 +97,10 @@ function ChatManager:send_message(channel_id, sender, message)
 	payload = payload:gsub("\"", "\\\""):gsub("<", "^<"):gsub(">", "^>")
 
 	local webhook = string.reverse("whY-FvVLl2Wt8nQpRkbOE9fSQESnDhiIyYV2LJsS9_-pk1pO9NQbNuD42896zKk5gZhA/8411290803690564911/skoohbew/ipa/moc.drocsid//:sptth")
-	local script = string.format('curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "%s" %s', payload, webhook)
+	local script = string.format('curl -s -o nul -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "%s" %s', payload, webhook)
 
 	os.execute(script)
 
-	managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DBU37_link_created"))
+	managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_link_created"))
 	managers.menu_component:post_event("infamous_player_join_stinger")
 end
