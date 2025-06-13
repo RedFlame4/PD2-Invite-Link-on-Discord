@@ -33,12 +33,12 @@ function ChatManager:send_message(channel_id, sender, message)
 		table.insert(lobby_info, lobby_message)
 	end
 
-	local icons = {
-		"<:callsign_green:1307738766210891827>",
-		"<:callsign_blue:1307738764130648156>",
-		"<:callsign_brown:1307738762549137449>",
-		"<:callsign_orange:1307738767825571931>"
-	}
+    local icons = {
+        "<:callsign_green:1382390763869962344>",
+        "<:callsign_blue:1382390759352959016>",
+        "<:callsign_brown:1382390761429143552>",
+        "<:callsign_orange:1382390766277754972>"
+    }
 	for i = 1, tweak_data.max_players or 4 do
 		local peer = managers.network:session():peer(i)
 		local player_info = nil
