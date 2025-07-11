@@ -6,7 +6,7 @@ function ChatManager:send_message(channel_id, sender, message)
 
 	local is_steam_mm = not SystemInfo.matchmaking and true or SystemInfo:matchmaking() == Idstring("MM_STEAM")
 	if Global.game_settings.permission ~= "public" and is_steam_mm then -- blame discord for removing steam joinlobby link embedding
-		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_permission"))
+		self:feed_system_message(self.GAME, managers.localization:text("DB_permission"))
 		managers.menu_component:post_event("menu_error")
 
 		return
@@ -143,6 +143,6 @@ function ChatManager:send_message(channel_id, sender, message)
 end
 
 function ChatManager:on_lobby_link_posted()
-	managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_link_created"))
+	self:feed_system_message(self.GAME, managers.localization:text("DB_link_created"))
 	managers.menu_component:post_event("infamous_player_join_stinger")
 end
