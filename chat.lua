@@ -4,7 +4,8 @@ function ChatManager:send_message(channel_id, sender, message)
 		return send_message_orig(self, channel_id, sender, message)
 	end
 
-	if Global.game_settings.permission ~= "public" then
+	local is_steam_mm = not SystemInfo.matchmaking and true or SystemInfo:matchmaking() == Idstring("MM_STEAM")
+	if Global.game_settings.permission ~= "public" and is_steam_mm then -- blame discord for removing steam joinlobby link embedding
 		managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_permission"))
 		managers.menu_component:post_event("menu_error")
 
@@ -13,6 +14,8 @@ function ChatManager:send_message(channel_id, sender, message)
 
 	local lobby_info = {}
 
+	local stage_info = nil
+	local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
 	if managers.job:has_active_job() then
 		local job_chain_data = managers.job.current_job_chain_data and managers.job:current_job_chain_data() or managers.job:current_job_data().chain -- current_job_chain_data added later
 		local job_name = managers.localization:text(managers.job:current_job_data().name_id)
@@ -20,25 +23,29 @@ function ChatManager:send_message(channel_id, sender, message)
 		local contract_name = #job_chain_data > 1 and string.format("%s: %s", job_name, level_name) or job_name
 
 		local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[Global.game_settings.difficulty])
-		local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or ""
-		local state = (Utils:IsInGameState() and not Utils:IsInHeist()) and "In Briefing" or Utils:IsInHeist() and "In Game" or "In Lobby"
+		local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or Global.game_settings.one_down and " (ONE DOWN)" or ""
 
-		local stage_info = string.format("**%s (%s)%s (%s)**", contract_name, difficulty, projob, state)
+		stage_info = string.format("**%s (%s)%s (%s)**", contract_name, difficulty, projob, state)
+	elseif managers.crime_spree and managers.crime_spree:is_active() then
+		local spree_level = managers.crime_spree:server_spree_level()
+		local icon = "<:cum_spree:1393290173999222886>"
 
-		table.insert(lobby_info, stage_info)
+		stage_info = string.format("**Crime Spree: %s %s (%s)**", spree_level, icon, state)
 	end
+
+	table.insert(lobby_info, stage_info)
 
 	local lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim()
 	if lobby_message ~= "" then
 		table.insert(lobby_info, lobby_message)
 	end
 
-    local icons = {
-        "<:callsign_green:1382390763869962344>",
-        "<:callsign_blue:1382390759352959016>",
-        "<:callsign_brown:1382390761429143552>",
-        "<:callsign_orange:1382390766277754972>"
-    }
+	local icons = {
+		"<:callsign_green:1382390763869962344>",
+		"<:callsign_blue:1382390759352959016>",
+		"<:callsign_brown:1382390761429143552>",
+		"<:callsign_orange:1382390766277754972>"
+	}
 	for i = 1, tweak_data.max_players or 4 do
 		local peer = managers.network:session():peer(i)
 		local player_info = nil
@@ -82,25 +89,54 @@ function ChatManager:send_message(channel_id, sender, message)
 	end
 
 	local my_lobby_id = managers.network.matchmake.lobby_handler and managers.network.matchmake.lobby_handler:id()
-	local join_link = string.format("`steam://joinlobby/218620/%s/%s`", my_lobby_id, managers.network.account:player_id())
+	local join_link = nil
+	if is_steam_mm then
+		join_link = string.format("`steam://joinlobby/218620/%s/%s`", my_lobby_id, managers.network.account:player_id())
+	else
+		join_link = string.format("Lobby code: `%s`", my_lobby_id)
+	end
 
 	table.insert(lobby_info, join_link)
 
 	local game_version = game_version()
 	local username = string.format("Crime.net (%s)", tweak_data.updates_table[game_version] or game_version)
+
+	if SystemInfo.matchmaking then
+		username = username .. string.format(" (%s)", is_steam_mm and "SteamMM" or "EpicMM")
+	end
+
+	local content_type = "application/json"
+	local headers = {
+		["Content-Type"] = content_type,
+		["Accept"] = "application/json"
+	}
 	local payload = json.encode({
 		username = username,
 		content = table.concat(lobby_info, "\n")
 	})
 
-	-- Windows cmd needs ^ to escape lt/gt symbols
-	payload = payload:gsub("\"", "\\\""):gsub("<", "^<"):gsub(">", "^>")
-
 	local webhook = string.reverse("whY-FvVLl2Wt8nQpRkbOE9fSQESnDhiIyYV2LJsS9_-pk1pO9NQbNuD42896zKk5gZhA/8411290803690564911/skoohbew/ipa/moc.drocsid//:sptth")
-	local script = string.format('curl -s -o nul -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "%s" %s', payload, webhook)
 
-	os.execute(script)
+	-- Native post request support added later
+	if Steam.http_request_post then
+		Steam:http_request_post(webhook, callback(self, self, "on_lobby_link_posted"), content_type, payload, payload:len(), headers)
+	else
+		local command = "curl -s -o nul -X POST"
+		for name, value in pairs(headers) do
+			command = command .. string.format(' -H "%s: %s"', name, value)
+		end
 
+		-- Windows cmd needs ^ to escape lt/gt symbols
+		payload = payload:gsub("\"", "\\\""):gsub("<", "^<"):gsub(">", "^>")
+
+		command = command .. string.format(' --data "%s" %s', payload, webhook)
+
+		os.execute(command)
+		self:on_lobby_link_posted()
+	end
+end
+
+function ChatManager:on_lobby_link_posted()
 	managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_link_created"))
 	managers.menu_component:post_event("infamous_player_join_stinger")
 end
