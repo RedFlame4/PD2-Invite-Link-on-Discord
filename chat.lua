@@ -22,10 +22,16 @@ function ChatManager:send_message(channel_id, sender, message)
 		local level_name = managers.localization:text(managers.job:current_level_data().name_id)
 		local contract_name = #job_chain_data > 1 and string.format("%s: %s", job_name, level_name) or job_name
 
-		local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[Global.game_settings.difficulty])
-		local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or Global.game_settings.one_down and " (ONE DOWN)" or ""
+		if managers.job:current_contact_id() == "skirmish" then
+			local contact_name = managers.localization:text(managers.job:current_contact_data().name_id)
+			
+			stage_info = string.format("**%s: %s (%s)**", contact_name, contract_name, state)
+		else
+			local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[Global.game_settings.difficulty])
+			local projob = managers.job:is_current_job_professional() and " (PRO JOB)" or Global.game_settings.one_down and " (ONE DOWN)" or ""
 
-		stage_info = string.format("**%s (%s)%s (%s)**", contract_name, difficulty, projob, state)
+			stage_info = string.format("**%s (%s)%s (%s)**", contract_name, difficulty, projob, state)
+		end
 	elseif managers.crime_spree and managers.crime_spree:is_active() then
 		local spree_level = managers.crime_spree:server_spree_level()
 		local icon = "<:cum_spree:1393290173999222886>"
