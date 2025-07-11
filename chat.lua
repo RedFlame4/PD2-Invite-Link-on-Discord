@@ -22,9 +22,9 @@ function ChatManager:send_message(channel_id, sender, message)
 		local level_name = managers.localization:text(managers.job:current_level_data().name_id)
 		local contract_name = #job_chain_data > 1 and string.format("%s: %s", job_name, level_name) or job_name
 
-		if managers.job:current_contact_id() == "skirmish" then
+		if managers.skirmish and managers.skirmish:is_skirmish() then
 			local contact_name = managers.localization:text(managers.job:current_contact_data().name_id)
-			
+
 			stage_info = string.format("**%s: %s (%s)**", contact_name, contract_name, state)
 		else
 			local difficulty = managers.localization:to_upper_text(tweak_data.difficulty_name_ids[Global.game_settings.difficulty])
