@@ -9,7 +9,7 @@ Hooks:Add("LocalizationManagerPostInit", "DiscordBot_loc", function(...)
 		LocalizationManager:add_localized_strings({
 			DB_link_created = "Ссылка для присоединения создана.",
 			DB_permission = "Ваше лобби не публично.",
-			DB_play_together = "Хочешь играть в компании? Напиши /link или /invite.\nЭто создаст ссылку для присоединения в канале #u37-looking-to-play на Discord сервере Original Pack, вы привлекёте внимание других игроков, которые хотят поиграть.",
+			DB_play_together = "Хочешь играть в компании? Напиши /link или /invite.\nЭто создаст ссылку для присоединения в канале #old-looking-to-play на Discord сервере Original Pack, вы привлекёте внимание других игроков, которые хотят поиграть.",
 		})
 	end
 end)

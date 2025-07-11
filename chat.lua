@@ -62,7 +62,7 @@ function ChatManager:send_message(channel_id, sender, message)
 			local level = is_local_peer and managers.experience:current_level() or peer:profile("level")
 
 			local character_name = managers.localization:to_upper_text("menu_" .. tostring(peer:character()))
-			local name_link = string.format("[%s](<https://steamcommunity.com/profiles/%s/>)", peer:name(), peer:user_id())
+			local name = is_steam_mm and string.format("[%s](<https://steamcommunity.com/profiles/%s/>)", peer:name(), peer:user_id()) or peer:name()
 			if rank and level then
 				rank, level = managers.experience.rank_string and managers.experience:rank_string(rank) or "", tostring(level)
 
@@ -73,7 +73,7 @@ function ChatManager:send_message(channel_id, sender, message)
 				player_info = string.format(
 					"%s **%s (%s)**%s",
 					character_name,
-					name_link,
+					name,
 					level,
 					i == 1 and " (Host)" or ""
 				)
@@ -82,7 +82,7 @@ function ChatManager:send_message(channel_id, sender, message)
 				player_info = string.format(
 					"%s **%s** (Joining)",
 					character_name,
-					name_link
+					name
 				)
 			end
 		else
