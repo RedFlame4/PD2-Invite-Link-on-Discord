@@ -1,7 +1,7 @@
 Hooks:Add("LocalizationManagerPostInit", "DiscordBot_loc", function(...)				
 	LocalizationManager:add_localized_strings({
 		DB_link_created = "Join link created.",
-		DB_permission = "Lobby permission isn't public.",
+		DB_permission = "Lobby permission is private.",
 		DB_play_together = "Wanna play together? Write /link or /invite followed by an optional message for the lobby.\nIt will create a join link into #old-looking-to-play channel on the Original Pack Discord server, you'll get attention from other players wanting to play.",
 	})
 
