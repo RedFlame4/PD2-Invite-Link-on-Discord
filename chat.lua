@@ -4,21 +4,21 @@ function ChatManager:send_message(channel_id, sender, message)
 		return send_message_orig(self, channel_id, sender, message)
 	end
 
-	local is_steam_mm = not SystemInfo.matchmaking and true or SystemInfo:matchmaking() == Idstring("MM_STEAM")
-	if Global.game_settings.permission ~= "public" and is_steam_mm then -- blame discord for removing steam joinlobby link embedding
+	if Global.game_settings.permission == "private" then
 		self:feed_system_message(self.GAME, managers.localization:text("DB_permission"))
 		managers.menu_component:post_event("menu_error")
 
 		return
 	end
 
+	local matchmaking = not SystemInfo.matchmaking and nil or SystemInfo:matchmaking() == Idstring("MM_STEAM") and "steam" or "epic"
 	local lobby_info = {
 		game_version = Application:version(),
-		matchmaking = SystemInfo.matchmaking and SystemInfo:matchmaking() or nil,
+		matchmaking = matchmaking,
 		lobby_id = managers.network.matchmake.lobby_handler:id(),
 		lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim(),
-		max_players = BigLobbyGlobals and BigLobbyGlobals.num_player_slots and BigLobbyGlobals:num_player_slots() or tweak_data.max_players or 4
-		players = {}
+		max_players = BigLobbyGlobals and BigLobbyGlobals.num_player_slots and BigLobbyGlobals:num_player_slots() or tweak_data.max_players or 4,
+		players = {},
 	}
 
 	local heist_data = {}
@@ -34,7 +34,7 @@ function ChatManager:send_message(channel_id, sender, message)
 		if is_crime_spree then
 		elseif managers.skirmish and managers.skirmish:is_skirmish() then
 			heist_data.is_holdout = true
-		elseif not is_crime_spree then
+		else
 			local job_chain_data = managers.job.current_job_chain_data and managers.job:current_job_chain_data() or managers.job:current_job_data().chain -- current_job_chain_data added later
 
 			heist_data.days = #job_chain_data
@@ -53,7 +53,9 @@ function ChatManager:send_message(channel_id, sender, message)
 	for _, peer in ipairs(managers.network:session():all_peers()) do
 		local is_local_peer = peer == managers.network:session():local_peer()
 		local player_data = {
-			character_name = managers.localization:text("menu_" .. tostring(peer:character()))
+			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
+			steam_id = matchmaking != "epic" and peer:user_id() or nil
+			username = peer:name(),
 		}
 
 		if is_local_peer then
