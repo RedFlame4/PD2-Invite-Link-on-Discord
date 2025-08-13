@@ -15,6 +15,7 @@ function ChatManager:send_message(channel_id, sender, message)
 	local lobby_info = {
 		game_version = Application:version(),
 		matchmaking = matchmaking,
+		channel_id = "746369574177472622",
 		lobby_id = managers.network.matchmake.lobby_handler:id(),
 		lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim(),
 		max_players = BigLobbyGlobals and BigLobbyGlobals.num_player_slots and BigLobbyGlobals:num_player_slots() or tweak_data.max_players or 4,
@@ -54,7 +55,7 @@ function ChatManager:send_message(channel_id, sender, message)
 		local is_local_peer = peer == managers.network:session():local_peer()
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
-			steam_id = matchmaking != "epic" and peer:user_id() or nil,
+			steam_id = matchmaking ~= "epic" and peer:user_id() or nil,
 			username = peer:name(),
 		}
 
@@ -80,7 +81,7 @@ function ChatManager:send_message(channel_id, sender, message)
 	}
 	local payload = json.encode(lobby_info)
 
-	local api_link = "/api/lobby-link"
+	local api_link = "https://paydayretro.com/api/lobby-link"
 
 	-- Native post request support added later, TODO: support HttpRequest
 	if Steam.http_request_post then
