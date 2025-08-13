@@ -54,7 +54,7 @@ function ChatManager:send_message(channel_id, sender, message)
 		local is_local_peer = peer == managers.network:session():local_peer()
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
-			steam_id = matchmaking != "epic" and peer:user_id() or nil
+			steam_id = matchmaking != "epic" and peer:user_id() or nil,
 			username = peer:name(),
 		}
 
