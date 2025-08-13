@@ -1,5 +1,5 @@
 DiscordLink = DiscordLink or {
-    _config_path = SavePath .. 'DiscordLink.txt'
+    _config_path = SavePath .. 'DiscordLink.txt',
     validation_rules = {
         channel_id = {
             required = true,
@@ -19,8 +19,8 @@ DiscordLink = DiscordLink or {
         version_identifier = {
             type = "string"
         }
-    }
-    attributes = {}
+    },
+    attributes = {},
 }
 
 function DiscordLink:_validate(attributes)
