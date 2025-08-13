@@ -15,12 +15,13 @@ function ChatManager:send_message(channel_id, sender, message)
 		return
 	end
 
+	local attributes = DiscordLink.attributes
 	local matchmaking = not SystemInfo.matchmaking and nil or SystemInfo:matchmaking() == Idstring("MM_STEAM") and "steam" or "epic"
 	local lobby_info = {
-		game_version = DiscordLink.send_version and Application:version() or nil,
-		version_identifier = DiscordLink.version_identifier or nil,
+		game_version = attributes.send_version and Application:version() or nil,
+		version_identifier = attributes.version_identifier or nil,
 		matchmaking = matchmaking,
-		channel_id = DiscordLink.channel_id,
+		channel_id = attributes.channel_id,
 		lobby_id = managers.network.matchmake.lobby_handler:id(),
 		lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim(),
 		max_players = BigLobbyGlobals and BigLobbyGlobals.num_player_slots and BigLobbyGlobals:num_player_slots() or tweak_data.max_players or 4,
