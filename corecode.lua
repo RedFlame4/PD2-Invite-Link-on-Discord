@@ -1,5 +1,5 @@
 DiscordLink = DiscordLink or {
-    _config_path = SavePath .. 'DiscordLink.txt',
+    _config_path = SavePath .. 'DiscordLink.json',
     validation_rules = {
         channel_id = {
             required = true,
