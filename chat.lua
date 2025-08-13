@@ -1,3 +1,7 @@
+if not next(DiscordLink.attributes) then
+	return
+end
+
 local send_message_orig = ChatManager.send_message
 function ChatManager:send_message(channel_id, sender, message)
 	if not string.begins(message, "/link") and not string.begins(message, "/invite") then
@@ -13,9 +17,10 @@ function ChatManager:send_message(channel_id, sender, message)
 
 	local matchmaking = not SystemInfo.matchmaking and nil or SystemInfo:matchmaking() == Idstring("MM_STEAM") and "steam" or "epic"
 	local lobby_info = {
-		game_version = Application:version(),
+		game_version = DiscordLink.send_version and Application:version() or nil,
+		version_identifier = DiscordLink.version_identifier or nil,
 		matchmaking = matchmaking,
-		channel_id = "746369574177472622",
+		channel_id = DiscordLink.channel_id,
 		lobby_id = managers.network.matchmake.lobby_handler:id(),
 		lobby_message = message:gsub("^/link", ""):gsub("^/invite", ""):trim(),
 		max_players = BigLobbyGlobals and BigLobbyGlobals.num_player_slots and BigLobbyGlobals:num_player_slots() or tweak_data.max_players or 4,
@@ -52,14 +57,13 @@ function ChatManager:send_message(channel_id, sender, message)
 	end
 
 	for _, peer in ipairs(managers.network:session():all_peers()) do
-		local is_local_peer = peer == managers.network:session():local_peer()
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
 			steam_id = matchmaking ~= "epic" and peer:user_id() or nil,
 			username = peer:name(),
 		}
 
-		if is_local_peer then
+		if peer == managers.network:session():local_peer() then
 			player_data.rank = managers.experience.current_rank and managers.experience:current_rank()
 			player_data.level = managers.experience:current_level()
 		else
