@@ -40,7 +40,7 @@ function DiscordLink:_validate(attributes)
 end
 
 function DiscordLink:set_attributes(attributes)
-    if not self:_validate(attributes) then
+    if next(self.attributes) or not self:_validate(attributes) then
         return
     end
 
