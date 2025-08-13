@@ -27,11 +27,11 @@ function DiscordLink:_validate(attributes)
     for name, rules in pairs(DiscordLink.validation_rules) do
         if attributes[name] then
             if rules.type and type(attributes[name]) ~= rules.type then
-                error(string.format("DiscordLink: %s must be a %s in attributes table", name, rules.type))
+                log(string.format("DiscordLink: %s must be a %s in attributes table", name, rules.type))
                 return false
             end
         elseif rules.required then
-            error(string.format("DiscordLink: %s must be present in attributes table", name))
+            log(string.format("DiscordLink: %s must be present in attributes table", name))
             return false
         end
     end
