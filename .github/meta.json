@@ -1,0 +1,8 @@
+[
+    {
+        "ident" : "DiscordInvite",
+        "version" : "%VERSION%",
+        "patchnotes_url" : "https://github.com/RedFlame4/PD2-Invite-Link-on-Discord/commits/main/",
+        "download_url" : "https://github.com/RedFlame4/PD2-Invite-Link-on-Discord/archive/refs/heads/main.zip"
+    }
+]
