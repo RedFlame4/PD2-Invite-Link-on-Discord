@@ -40,12 +40,14 @@ function DiscordLink:_validate(attributes)
 end
 
 function DiscordLink:set_attributes(attributes)
-    if next(self.attributes) or not self:_validate(attributes) then
+    if not self:_validate(attributes) then
         return
     end
 
     for k, v in pairs(attributes) do
-        self.attributes[k] = v
+        if not self.attributes[k] then
+            self.attributes[k] = v
+        end
     end
 end
 
