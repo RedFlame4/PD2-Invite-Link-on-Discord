@@ -16,7 +16,11 @@ function ChatManager:send_message(channel_id, sender, message)
 		return
 	end
 
-	local matchmaking = not SystemInfo.matchmaking and nil or SystemInfo:matchmaking() == Idstring("MM_STEAM") and "steam" or "epic"
+	local matchmaking = nil
+	if SystemInfo.matchmaking then
+		matchmaking = SystemInfo:matchmaking() == Idstring("MM_STEAM") and "steam" or "epic"
+	end
+
 	local lobby_info = {
 		game_version = attributes.send_version and Application:version() or nil,
 		version_identifier = attributes.version_identifier or nil,
@@ -57,14 +61,19 @@ function ChatManager:send_message(channel_id, sender, message)
 		lobby_info.heist_data = heist_data
 	end
 
-	for _, peer in ipairs(managers.network:session():all_peers()) do
+	-- managers.network:session():all_peers() added later...
+	local local_peer = managers.network:session():local_peer()
+	local all_peers = managers.network:session():peers()
+	all_peers[local_peer:id()] = local_peer
+
+	for _, peer in ipairs(all_peers) do
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
 			steam_id = matchmaking ~= "epic" and peer:user_id() or nil,
 			username = peer:name(),
 		}
 
-		if peer == managers.network:session():local_peer() then
+		if peer == local_peer then
 			player_data.rank = managers.experience.current_rank and managers.experience:current_rank()
 			player_data.level = managers.experience:current_level()
 		else
@@ -76,7 +85,7 @@ function ChatManager:send_message(channel_id, sender, message)
 			end
 		end
 
-		table.insert(lobby_info.players, player_data)
+		lobby_info.players[peer:id()] = player_data
 	end
 
 	local content_type = "application/json"
