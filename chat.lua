@@ -1,11 +1,12 @@
-if not next(DiscordLink.attributes) then
-	return
-end
-
 local send_message_orig = ChatManager.send_message
 function ChatManager:send_message(channel_id, sender, message)
 	if not string.begins(message, "/link") and not string.begins(message, "/invite") then
 		return send_message_orig(self, channel_id, sender, message)
+	end
+
+	local attributes = DiscordLink.attributes
+	if not next(attributes) then
+		return
 	end
 
 	if Global.game_settings.permission == "private" then
@@ -15,7 +16,6 @@ function ChatManager:send_message(channel_id, sender, message)
 		return
 	end
 
-	local attributes = DiscordLink.attributes
 	local matchmaking = not SystemInfo.matchmaking and nil or SystemInfo:matchmaking() == Idstring("MM_STEAM") and "steam" or "epic"
 	local lobby_info = {
 		game_version = attributes.send_version and Application:version() or nil,

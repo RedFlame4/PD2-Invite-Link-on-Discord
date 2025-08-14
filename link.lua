@@ -1,7 +1,3 @@
-if not next(DiscordLink.attributes) then
-	return
-end
-
 Hooks:Add("LocalizationManagerPostInit", "DiscordBot_loc", function(...)				
 	LocalizationManager:add_localized_strings({
 		DB_link_created = "Join link created.",
@@ -20,7 +16,7 @@ end)
 
 Hooks:PostHook(MenuManager, "created_lobby", "DiscordBot_created_lobby", function()
 	DelayedCalls:Add("DiscordBot_message_delay", 1, function()
-		if managers.chat then
+		if managers.chat and next(DiscordLink.attributes) then
 			managers.chat:feed_system_message(ChatManager.GAME, managers.localization:text("DB_play_together", {
 				SERVER_NAME = DiscordLink.attributes.server_name,
 				CHANNEL_NAME = DiscordLink.attributes.channel_name,

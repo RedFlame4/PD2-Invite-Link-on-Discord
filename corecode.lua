@@ -45,7 +45,7 @@ function DiscordLink:set_attributes(attributes)
     end
 
     for k, v in pairs(attributes) do
-        if not self.attributes[k] then
+        if self.attributes[k] == nil then
             self.attributes[k] = v
         end
     end
