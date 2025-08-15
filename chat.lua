@@ -66,7 +66,7 @@ function ChatManager:send_message(channel_id, sender, message)
 	local all_peers = managers.network:session():peers()
 	all_peers[local_peer:id()] = local_peer
 
-	for _, peer in ipairs(all_peers) do
+	for peer_id, peer in pairs(all_peers) do
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
 			steam_id = matchmaking ~= "epic" and peer:user_id() or nil,
@@ -85,7 +85,7 @@ function ChatManager:send_message(channel_id, sender, message)
 			end
 		end
 
-		lobby_info.players[peer:id()] = player_data
+		lobby_info.players[peer_id] = player_data
 	end
 
 	local content_type = "application/json"
