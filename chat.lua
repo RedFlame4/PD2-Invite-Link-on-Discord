@@ -63,7 +63,7 @@ function ChatManager:send_message(channel_id, sender, message)
 
 	-- managers.network:session():all_peers() added later...
 	local local_peer = managers.network:session():local_peer()
-	local all_peers = managers.network:session():peers()
+	local all_peers = clone(managers.network:session():peers())
 	all_peers[local_peer:id()] = local_peer
 
 	for peer_id, peer in pairs(all_peers) do
