@@ -61,12 +61,8 @@ function ChatManager:send_message(channel_id, sender, message)
 		lobby_info.heist_data = heist_data
 	end
 
-	-- managers.network:session():all_peers() added later...
-	local local_peer = managers.network:session():local_peer()
-	local all_peers = clone(managers.network:session():peers())
-	all_peers[local_peer:id()] = local_peer
-
-	for peer_id, peer in pairs(all_peers) do
+	-- managers.network:session():all_peers() added in SBLT-CUS
+	for peer_id, peer in pairs(managers.network:session():all_peers()) do
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
 			steam_id = matchmaking ~= "epic" and peer:user_id() or nil,
