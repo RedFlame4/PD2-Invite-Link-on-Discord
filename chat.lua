@@ -62,6 +62,7 @@ function ChatManager:send_message(channel_id, sender, message)
 	end
 
 	-- managers.network:session():all_peers() added in SBLT-CUS
+	local local_peer = managers.network:session():local_peer()
 	for peer_id, peer in pairs(managers.network:session():all_peers()) do
 		local player_data = {
 			character_name = managers.localization:text("menu_" .. tostring(peer:character())),
